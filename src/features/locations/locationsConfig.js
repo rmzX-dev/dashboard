@@ -1,7 +1,7 @@
 export const locationsConfig = {
     title: 'Administrador de ubicaciones',
     columns: [
-        { key: 'id_location', label: 'ID', sortable: true },
+        { key: 'id', label: 'ID', sortable: true },
         { key: 'name', label: 'Nombre' },
         { key: 'state', label: 'Estado' },
         { key: 'municipality', label: 'Municipio' },
@@ -12,9 +12,25 @@ export const locationsConfig = {
     form: [
         { name: 'name', label: 'Nombre', type: 'text', required: true },
         { name: 'state', label: 'Estado', type: 'text', required: false },
-        { name: 'municipality', label: 'Municipio', type: 'text', required: false },
-        { name: 'latitude', label: 'Latitud', type: 'number', required: false, step: '0.000001' },
-        { name: 'longitude', label: 'Longitud', type: 'number', required: false, step: '0.000001' },
+        {
+            name: 'municipality',
+            label: 'Municipio',
+            type: 'text',
+            required: false,
+        },
+        {
+            name: 'latitude',
+            label: 'Latitud',
+            type: 'number',
+            required: false,
+            step: '0.000001',
+        },
+        {
+            name: 'longitude',
+            label: 'Longitud',
+            type: 'number',
+            required: false,
+            step: '0.000001',
+        },
     ],
 }
-

@@ -27,11 +27,8 @@ export default function LocationsPage() {
         { value: 'oldest', label: 'Más antiguos primero' },
     ]
 
-    // Filtrar, buscar y ordenar datos
     const filteredData = useMemo(() => {
         let filtered = items
-
-        // Aplicar búsqueda
         if (searchTerm) {
             filtered = filtered.filter((item) =>
                 Object.values(item).some((value) =>
@@ -41,27 +38,20 @@ export default function LocationsPage() {
                 )
             )
         }
-
-        // Aplicar ordenamiento por fecha (si existe un campo de fecha)
         if (sortByDate) {
-            // Si no hay campo de fecha, no aplicamos este ordenamiento
-            // Puedes agregar un campo de fecha si lo necesitas
         }
 
-        // Aplicar ordenamiento por columna (ID)
         if (sortByColumn.column) {
             filtered = [...filtered].sort((a, b) => {
                 const aVal = a[sortByColumn.column]
                 const bVal = b[sortByColumn.column]
 
-                // Manejar números
                 if (typeof aVal === 'number' && typeof bVal === 'number') {
                     return sortByColumn.direction === 'asc'
                         ? aVal - bVal
                         : bVal - aVal
                 }
 
-                // Manejar strings
                 const aStr = String(aVal || '').toLowerCase()
                 const bStr = String(bVal || '').toLowerCase()
                 if (sortByColumn.direction === 'asc') {
@@ -75,14 +65,12 @@ export default function LocationsPage() {
         return filtered
     }, [items, searchTerm, sortByDate, sortByColumn])
 
-    // Calcular paginación
     const totalPages = Math.ceil(filteredData.length / itemsPerPage)
     const paginatedData = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage
         return filteredData.slice(startIndex, startIndex + itemsPerPage)
     }, [filteredData, currentPage, itemsPerPage])
 
-    // Resetear página cuando cambian los filtros
     const handleSearchChange = (value) => {
         setSearchTerm(value)
         setCurrentPage(1)
@@ -96,13 +84,11 @@ export default function LocationsPage() {
     const handleColumnSort = (columnKey) => {
         setSortByColumn((prev) => {
             if (prev.column === columnKey) {
-                // Si ya está ordenando por esta columna, cambiar dirección
                 return {
                     column: columnKey,
                     direction: prev.direction === 'asc' ? 'desc' : 'asc',
                 }
             } else {
-                // Nueva columna, empezar con ascendente
                 return {
                     column: columnKey,
                     direction: 'asc',
@@ -118,7 +104,7 @@ export default function LocationsPage() {
 
     const handleUpdate = async (formData) => {
         if (editingItem) {
-            await update(editingItem.id_location, formData)
+            await update(editingItem.id, formData)
             setEditingItem(null)
         }
     }
@@ -131,7 +117,6 @@ export default function LocationsPage() {
         if (deleteConfirm.id) {
             await remove(deleteConfirm.id)
             setDeleteConfirm({ open: false, id: null })
-            // Ajustar página si es necesario
             if (paginatedData.length === 1 && currentPage > 1) {
                 setCurrentPage(currentPage - 1)
             }
@@ -163,6 +148,7 @@ export default function LocationsPage() {
                     setItemsPerPage(value)
                     setCurrentPage(1)
                 }}
+                addButtonText="Add Location"
             />
 
             {editingItem && (
@@ -188,4 +174,3 @@ export default function LocationsPage() {
         </>
     )
 }
-

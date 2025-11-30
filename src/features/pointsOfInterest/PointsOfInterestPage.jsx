@@ -1,13 +1,14 @@
 import { useState, useMemo } from 'react'
-import { usersApi } from '../../api/usersApi'
+import { pointsOfInterestApi } from '../../api/pointsOfInterestApi'
 import { useResource } from '../../hooks/useResource'
-import { usersConfig } from './usersConfig'
+import { pointsOfInterestConfig } from './pointsOfInterestConfig'
 import DataTable from '../../components/ui/DataTable'
 import CrudFormModal from '../../components/ui/CrudFormModal'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 
-export default function UsersPage() {
-    const { items, loading, create, update, remove } = useResource(usersApi)
+export default function PointsOfInterestPage() {
+    const { items, loading, create, update, remove } =
+        useResource(pointsOfInterestApi)
     const [searchTerm, setSearchTerm] = useState('')
     const [sortByDate, setSortByDate] = useState('')
     const [sortByColumn, setSortByColumn] = useState({
@@ -22,13 +23,11 @@ export default function UsersPage() {
         id: null,
     })
 
-    // Opciones de ordenamiento por fecha
     const sortOptions = [
         { value: 'recent', label: 'Más recientes primero' },
         { value: 'oldest', label: 'Más antiguos primero' },
     ]
 
-    // Filtrar, buscar y ordenar datos
     const filteredData = useMemo(() => {
         let filtered = items
 
@@ -43,16 +42,6 @@ export default function UsersPage() {
             )
         }
 
-        // Aplicar ordenamiento por fecha
-        if (sortByDate) {
-            filtered = [...filtered].sort((a, b) => {
-                const dateA = new Date(a.registered_at || 0)
-                const dateB = new Date(b.registered_at || 0)
-                return sortByDate === 'recent' ? dateB - dateA : dateA - dateB
-            })
-        }
-
-        // Aplicar ordenamiento por columna (ID)
         if (sortByColumn.column) {
             filtered = [...filtered].sort((a, b) => {
                 const aVal = a[sortByColumn.column]
@@ -65,7 +54,20 @@ export default function UsersPage() {
                         : bVal - aVal
                 }
 
-                // Manejar strings
+                if (typeof aVal === 'boolean' && typeof bVal === 'boolean') {
+                    return sortByColumn.direction === 'asc'
+                        ? aVal === bVal
+                            ? 0
+                            : aVal
+                            ? 1
+                            : -1
+                        : aVal === bVal
+                        ? 0
+                        : aVal
+                        ? -1
+                        : 1
+                }
+
                 const aStr = String(aVal || '').toLowerCase()
                 const bStr = String(bVal || '').toLowerCase()
                 if (sortByColumn.direction === 'asc') {
@@ -79,14 +81,12 @@ export default function UsersPage() {
         return filtered
     }, [items, searchTerm, sortByDate, sortByColumn])
 
-    // Calcular paginación
     const totalPages = Math.ceil(filteredData.length / itemsPerPage)
     const paginatedData = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage
         return filteredData.slice(startIndex, startIndex + itemsPerPage)
     }, [filteredData, currentPage, itemsPerPage])
 
-    // Resetear página cuando cambian los filtros
     const handleSearchChange = (value) => {
         setSearchTerm(value)
         setCurrentPage(1)
@@ -100,13 +100,11 @@ export default function UsersPage() {
     const handleColumnSort = (columnKey) => {
         setSortByColumn((prev) => {
             if (prev.column === columnKey) {
-                // Si ya está ordenando por esta columna, cambiar dirección
                 return {
                     column: columnKey,
                     direction: prev.direction === 'asc' ? 'desc' : 'asc',
                 }
             } else {
-                // Nueva columna, empezar con ascendente
                 return {
                     column: columnKey,
                     direction: 'asc',
@@ -122,12 +120,7 @@ export default function UsersPage() {
 
     const handleUpdate = async (formData) => {
         if (editingItem) {
-            // Si el password está vacío, no lo incluimos en la actualización
-            const updateData = { ...formData }
-            if (!updateData.password || updateData.password.trim() === '') {
-                delete updateData.password
-            }
-            await update(editingItem.id, updateData)
+            await update(editingItem.id, formData)
             setEditingItem(null)
         }
     }
@@ -150,11 +143,11 @@ export default function UsersPage() {
     return (
         <>
             <DataTable
-                title={usersConfig.title}
-                columns={usersConfig.columns}
+                title={pointsOfInterestConfig.title}
+                columns={pointsOfInterestConfig.columns}
                 data={paginatedData}
                 loading={loading}
-                formSchema={usersConfig.form}
+                formSchema={pointsOfInterestConfig.form}
                 onCreate={create}
                 onDelete={handleDeleteClick}
                 onEdit={handleEdit}
@@ -172,12 +165,12 @@ export default function UsersPage() {
                     setItemsPerPage(value)
                     setCurrentPage(1)
                 }}
-                addButtonText="Add User"
+                addButtonText="Add Point"
             />
 
             {editingItem && (
                 <CrudFormModal
-                    formSchema={usersConfig.form}
+                    formSchema={pointsOfInterestConfig.form}
                     onSubmit={handleUpdate}
                     editingItem={editingItem}
                     open={true}
@@ -189,8 +182,8 @@ export default function UsersPage() {
                 open={deleteConfirm.open}
                 onClose={() => setDeleteConfirm({ open: false, id: null })}
                 onConfirm={handleDeleteConfirm}
-                title="Eliminar Usuario"
-                message="¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer."
+                title="Eliminar Punto de Interés"
+                message="¿Estás seguro de que deseas eliminar este punto de interés? Esta acción no se puede deshacer."
                 confirmText="Eliminar"
                 cancelText="Cancelar"
                 type="danger"

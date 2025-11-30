@@ -14,6 +14,7 @@ export function useResource(api) {
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || "Error al cargar los datos";
       showToast("error", errorMessage);
+      setItems([]);
     } finally {
       setLoading(false);
     }

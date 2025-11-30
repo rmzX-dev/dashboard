@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Users, ShieldCheck, MapPin } from 'lucide-react'
+import { Users, ShieldCheck, MapPin, Landmark } from 'lucide-react'
 
 export default function Sidebar() {
     const location = useLocation()
@@ -11,6 +11,12 @@ export default function Sidebar() {
             label: 'Ubicaciones',
             icon: MapPin,
             path: '/locations',
+        },
+        {
+            id: 'points-of-interest',
+            label: 'Puntos de Interés',
+            icon: Landmark,
+            path: '/points-of-interest',
         },
         { id: 'admins', label: 'Admins', icon: ShieldCheck, path: '/admins' },
     ]
